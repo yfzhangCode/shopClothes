@@ -1,5 +1,6 @@
 # shop-clothes
-
+## Project desc
+    使用 vue-cli3 脚手架搭建项目,项目为学习演示使用的demo。 
 ## Project setup
 ```
 npm install

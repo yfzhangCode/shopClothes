@@ -1,0 +1,19 @@
+html,body,div,p,ul,li,ol,li,h1,h2,h3,h4,h5,section,header,footer,nav,span,img,a,strong,button {
+  margin: 0;
+  padding: 0;
+}
+
+ul, li {
+  list-style: none;
+}
+
+.clearfix:after {
+  content: '';
+  display: block;
+  height: 0;
+  visibility: hidden;
+  clear: both;
+}
+.clearfix {
+  zoom: 1;
+}
