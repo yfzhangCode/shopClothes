@@ -3,7 +3,7 @@
     <!-- 顶部导航 -->
     <nav-tabar class="nav-tabar">
       <div class="title" slot="center">
-        <span>购物街</span> 
+        <span>购物街</span>
       </div>
     </nav-tabar>
   </div>
