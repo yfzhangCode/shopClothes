@@ -6,17 +6,26 @@
         <span>购物街</span>
       </div>
     </nav-tabar>
-    <!-- 轮播图 -->
-    <home-swiper :banner="banners"></home-swiper>
-    <!-- 热门标签 -->
-    <home-recommend :fetureView="recommend"></home-recommend>
-    <!-- 推荐分类 -->
-    <hot-recommend></hot-recommend>
-    <!-- tab切换 -->
-    <tab-control :tabList="tablist" @itemClick="itemClick" class="tab-contr"></tab-control>
-    <!-- 商品数据 -->
-    <Goods :goods="showGoods"/>
-    <!--  -->
+    <scroll class="content"
+      ref="scrollBox"
+      @scrollOn="scrollContent"
+      :probeType="3"
+      :pull-up-load="true"
+      @LoadMore="UpLoadMore"
+      >
+      <!-- 轮播图 -->
+      <home-swiper :banner="banners"></home-swiper>
+      <!-- 热门标签 -->
+      <home-recommend :fetureView="recommend"></home-recommend>
+      <!-- 推荐分类 -->
+      <hot-recommend></hot-recommend>
+      <!-- tab切换 -->
+      <tab-control :tabList="tablist" @itemClick="itemClick" class="tab-contr"></tab-control>
+      <!-- 商品数据 -->
+      <Goods :goods="showGoods"/>
+    </scroll>
+    <!-- 返回顶部的导航 -->
+    <back-top @click.native="backTop" v-show="isShowBackTop"></back-top>
   </div>
 </template>
 <script>
@@ -27,6 +36,8 @@ import HomeRecommend from './childrenCons/HomeRecommend'
 import HotRecommend from './childrenCons/HotRecommend'
 import TabControl from 'component/content/tabControl/TabControl'
 import Goods from 'component/content/goods/Goods'
+import Scroll from 'component/common/betterScroll/BetterScroll'
+import BackTop from 'component/common/backTop/BackTop'
 
 import { getData, homeData } from '../../http/home.js'
 import { ERR_OK } from '../../utils/const'
@@ -42,7 +53,8 @@ export default {
         'pop': {page: 0, list: []},
         'new': {page: 0, list: []},
         'sell': {page: 0, list: []}
-      }
+      },
+      isShowBackTop: false // 控制返回顶部按钮的显示隐藏
     }
   },
   components: {
@@ -51,7 +63,9 @@ export default {
     HomeRecommend,
     HotRecommend,
     TabControl,
-    Goods
+    Goods,
+    Scroll,
+    BackTop
   },
   created () {
     // 获取首页数据
@@ -63,6 +77,9 @@ export default {
     this.getHomeGoodsData('sell')
   },
   methods: {
+    /**
+     * 网络请求事件
+     */
     // 获取多个数据
     getMultadata() {
       getData().then((res) =>{
@@ -74,16 +91,21 @@ export default {
         console.log(err)
       })
     },
+    /**
+     * 业务逻辑事件
+     */
     // 获取首页商品数据
     getHomeGoodsData(type) {
+      console.log(type)
       const page = this.goods[type].page + 1;
       homeData(type, page).then((res) => {
-        console.log(res)
+        // console.log(res)
         if (res.returnCode === ERR_OK) {
           this.goods[type].list.push(...res.data.list)
           // page + 1
-          this.goods[type].page + 1
+          this.goods[type].page++
         }
+        this.$refs.scrollBox.finishPullUp()
       }).catch((err) => {
         console.log(err)
       })
@@ -104,6 +126,19 @@ export default {
         default:
           break;
       }
+    },
+    // 返回顶部
+    backTop () {
+      // console.log(this.$refs.scrollBox)
+      this.$refs.scrollBox.scrollTo(0,0,500)
+    },
+    // 返回顶部按钮的显示或隐藏
+    scrollContent (e){
+      this.isShowBackTop = -e.y > 1000
+    },
+    // 上拉加载更多
+    UpLoadMore () {
+      this.getHomeGoodsData(this.currentType)
     }
   },
   computed: {
@@ -115,9 +150,11 @@ export default {
 </script>
 <style lang='scss' scoped>
 #home {
-  // height: 100vh;
+  height: 100vh;
   padding-top: 44px;
   padding-bottom: 59px;
+  position: relative;
+  box-sizing: border-box;
 }
 .nav-tabar {
   background-color: $theme_color;
@@ -132,5 +169,12 @@ export default {
 .tab-contr {
   position: sticky;
   top: 44px;
+}
+.content {
+  width: 100%;
+  position: absolute;
+  top: 44px;
+  bottom: 49px;
+  left: 0;
 }
 </style>

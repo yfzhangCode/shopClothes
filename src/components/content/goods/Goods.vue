@@ -33,7 +33,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
-  width:100%;
+  width: 100%;
   padding: 0 4px;
   box-sizing: border-box;
 }
