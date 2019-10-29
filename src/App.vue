@@ -1,6 +1,8 @@
 <template>
   <div id="app">
-    <router-view></router-view>
+    <keep-alive>
+      <router-view></router-view>
+    </keep-alive>
     <!-- 主页面底部导航栏 -->
     <main-tabar></main-tabar>
   </div>
@@ -17,5 +19,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import './assets/style/index.scss';
+@import 'assets/style/index.scss';
 </style>

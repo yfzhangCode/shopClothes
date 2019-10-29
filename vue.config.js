@@ -8,7 +8,8 @@ module.exports = {
 				'common': '@/common',
 				'component': '@/components',
 				'http': '@/http',
-				'views': '@/views'
+				'views': '@/views',
+				'utils': '@/utils'
 			}
 		}
 	},

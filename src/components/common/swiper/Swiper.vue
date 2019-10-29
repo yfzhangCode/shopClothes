@@ -48,10 +48,11 @@ export default {
   },
   mounted () {
     setTimeout(() => {
+      // 初始化创建 圆点
       this.handlDOM();
 
       this.startTimer();
-    }, 100);
+    }, 200);
   },
   methods: {
     /** 
@@ -66,6 +67,7 @@ export default {
       // console.log(swiperitemels)
       // 保存轮播图的个数 渲染 控制 圆点
       this.slideCount = swiperitemels.length
+      // console.log(this.slideCount)
       // 为轮播图添加前后 克隆元素
       if(this.slideCount > 1) {
         // 克隆第一个元素

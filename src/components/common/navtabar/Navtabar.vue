@@ -21,7 +21,8 @@ export default {
   display: flex;
   line-height: 44px;
   height: 44px;
-  .left, .right {
+  .left,
+  .right {
     width: 60px;
   }
   .center {

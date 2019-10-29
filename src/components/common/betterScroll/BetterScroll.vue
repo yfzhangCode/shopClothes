@@ -41,13 +41,17 @@ export default {
         pullUpLoad: this.pullUpLoad
       })
       // 监听滚动
-      this.scrollOn()
+      if (this.probeType === 2 || this.probeType === 3) {
+        this.scrollOn()
+      }
       // 监听上拉加载
-      this.pullUpload()
+      if (this.pullUpLoad) {
+        this.pullUpload()
+      }
     },
     // 滚动到顶部
     scrollTo (x, y, time=500) { // time 滚动动画时间 默认值
-      this.scroll.scrollTo(x, y, time)
+      this.scroll && this.scroll.scrollTo(x, y, time)
     },
     // 滚动事件
     scrollOn() {
@@ -59,12 +63,20 @@ export default {
     pullUpload () {
       this.scroll.on('pullingUp',() => {
         // 一次上拉加载动作完成
-        console.log('上拉加载完成')
         this.$emit('LoadMore')
       })
     },
+    // 上拉加载完成
     finishPullUp () {
-      this.scroll.finishPullUp()
+      this.scroll && this.scroll.finishPullUp()
+    },
+    // 刷新可滚动高度 scrollerhHeight
+    refresh () {
+      this.scroll && this.scroll.refresh()
+    },
+    // 获取滚动的 Y 值
+    getScrollY () {
+      return this.scroll ? this.scroll.y : 0
     }
   }
 }
