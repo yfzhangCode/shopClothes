@@ -1,6 +1,6 @@
 <template>
   <div class="zyf-swiper">
-    <div class="swiper" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
+    <div class="swiper" ref="swiper" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
       <slot></slot>
     </div>
     <slot name="indicator"></slot>
@@ -61,7 +61,7 @@ export default {
     */
     handlDOM() {
       // 1 获取操作的元素
-      let swiperNum = document.querySelector('.swiper')
+      let swiperNum = this.$refs.swiper
       let swiperitemels = swiperNum.getElementsByClassName('swiper-item')
       // console.log(swiperNum)
       // console.log(swiperitemels)

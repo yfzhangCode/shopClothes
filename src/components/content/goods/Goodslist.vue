@@ -1,5 +1,5 @@
 <template>
-  <div class="goods-list">
+  <div class="goods-list" @click.stop="itemGoodsClick">
     <img :src="goodslist.show.img" alt="" @load="imgLoad">
     <div class="text">
       <h3>{{goodslist.title}}</h3>
@@ -20,8 +20,14 @@ export default {
     }
   },
   methods: {
+    // 图片加载完成
     imgLoad () {
       this.$Bus.$emit('imgLoad')
+    },
+    // 点击获取详情信息
+    itemGoodsClick () {
+      console.log(this.goodslist.iid)
+      this.$router.push('/detail/' + this.goodslist.iid)
     }
   }
 }

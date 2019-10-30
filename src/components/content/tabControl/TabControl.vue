@@ -54,9 +54,9 @@ export default {
       }
     }
     .tab-active {
-      color: red;
+      color: $theme_color;
       span {
-        border-bottom: 3px solid red;
+        border-bottom: 3px solid $theme_color;
       }
     }
   }

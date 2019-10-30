@@ -105,7 +105,6 @@ export default {
   },
   // 当前活跃的路由
   activated() {
-    console.log('ee')
     this.$refs.scrollBox.scrollTo(0, this.saveY, 0)
     // 重新计算滚动高度
     this.$refs.scrollBox.refresh()
@@ -113,7 +112,6 @@ export default {
   // 
   deactivated() {
     this.saveY = this.$refs.scrollBox.getScrollY()
-    console.log(this.saveY);
   },
   methods: {
     /**
@@ -192,7 +190,8 @@ export default {
     // 上拉加载更多
     UpLoadMore() {
       this.getHomeGoodsData(this.currentType)
-    }
+    },
+    // 获取详情页面数据
   },
   computed: {
     showGoods() {

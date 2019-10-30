@@ -1,7 +1,7 @@
 <template>
   <div class="goods">
-    <goods-list 
-      v-for="(item, index) in goods" 
+    <goods-list
+      v-for="(item, index) in goods"
       :key="index"
       :goodslist="item"
       >
@@ -21,7 +21,6 @@ export default {
     }
   },
   methods: {
-
   },
   components: {
     GoodsList
