@@ -1,18 +1,23 @@
 <template>
   <div id="app">
+    <keep-alive exclude="GoodsDetail">
+      <router-view></router-view>
+    </keep-alive>
+    <!-- 主页面底部导航栏 -->
+    <main-tabar></main-tabar>
   </div>
 </template>
 
 <script>
+import MainTabar from 'component/content/maintabar/Maintabar.vue'
 export default {
-  name: 'app'
+  name: 'app',
+  components: {
+    MainTabar
+  }
 }
 </script>
 
 <style lang="scss">
-@import './assets/style/index.scss';
-body {
-  color: $theme_color;
-  background-color: $theme_color;
-}
+@import 'assets/style/index.scss';
 </style>
