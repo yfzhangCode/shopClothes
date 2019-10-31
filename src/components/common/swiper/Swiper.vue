@@ -206,7 +206,6 @@ export default {
 </script>
 <style lang="scss" scoped>
 .zyf-swiper {
-  width: 100%;
   overflow: hidden;
   position: relative;
   .swiper {
