@@ -7,6 +7,11 @@ ul, li {
   list-style: none;
 }
 
+a {
+  text-decoration: none;
+  display: block;
+}
+
 .clearfix:after {
   content: '';
   display: block;
@@ -16,4 +21,11 @@ ul, li {
 }
 .clearfix {
   zoom: 1;
+}
+
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
