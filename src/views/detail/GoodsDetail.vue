@@ -1,31 +1,30 @@
 <template>
   <div class="goods-detail">
     <!-- 详情导航 -->
-    <top-nav></top-nav>
-    <!-- 详情页swiper -->
-    <div class="swiper">
+    <top-nav class="detail-nav"></top-nav>
+    <b-scroll class="content"
+      ref="scrollDetail"
+      :probeType="3"
+      @scrollOn="ScrollContent"
+      >
+      <!-- 详情页swiper -->
       <swiper-detail :TopImges="topImg"></swiper-detail>
-    </div>
-    <!-- 详情基本信息 -->
-    <div class="baseinfo">
+      <!-- 详情基本信息 -->
       <goods-base-info :goodsInfo="goodBaseInfo" :shopInfo="shopInfo"></goods-base-info>
-    </div>
-    <!-- 店铺详情 -->
-    <div class="shop-info">
+      <!-- 店铺详情 -->
       <shop-info :shopInfo="shopInfo"></shop-info>
-    </div>
-    <!-- 商品详细信息 -->
-    <div>
-      <goods-detail-info :goodsDetailInfo="detailInfo"></goods-detail-info>
-    </div>
-    <!-- 商品参数信息 -->
-    <div>
+      <!-- 商品详细信息 -->
+      <goods-detail-info :goodsDetailInfo="detailInfo" @ImgesLoad="ImgesLoad"></goods-detail-info>
+      <!-- 商品参数信息 -->
       <goods-params-info :paramsInfo="goodsParmInfo.info" :pramsRule="goodsParmInfo.rule"></goods-params-info>
-    </div>
-    <!-- 用户评价 -->
-    <user-rate :userRateInfo="userRate"></user-rate>
-    <!-- 热门推荐 -->
-    <detail-recommend :detailRecodData="detailRecodData"></detail-recommend>
+      <!-- 用户评价 -->
+      <user-rate :userRateInfo="userRate"></user-rate>
+      <!-- 热门推荐 -->
+      <detail-recommend :detailRecodData="detailRecodData"></detail-recommend>
+    </b-scroll>
+
+    <!-- backTop -->
+    <back-top v-show="idShowabacktop" @click.native="BackTop"></back-top>
   </div>
 </template>
 <script>
@@ -37,6 +36,9 @@ import GoodsDetailInfo from './childrenComs/GoodsDetailInfo'
 import GoodsParamsInfo from './childrenComs/GoodsParamsInfo'
 import UserRate from './childrenComs/UserRate'
 import DetailRecommend from './childrenComs/DetailRecommend'
+import BackTop from 'component/common/backTop/BackTop'
+
+import BScroll from 'component/common/betterScroll/BetterScroll'
 
 import { Detail, DetailRecommendR, GoodBaseInfo, Shop } from 'http/detail'
 export default {
@@ -54,7 +56,8 @@ export default {
         info: {}
       },
       userRate: {},
-      detailRecodData: []
+      detailRecodData: [],
+      idShowabacktop: false
     }
   },
   created() {
@@ -73,7 +76,9 @@ export default {
     GoodsDetailInfo,
     GoodsParamsInfo,
     UserRate,
-    DetailRecommend
+    DetailRecommend,
+    BScroll,
+    BackTop
   },
   methods: {
     /**
@@ -82,7 +87,6 @@ export default {
      */
     getDetailData (id) {
       Detail(id).then((res) => {
-        console.log(res);
         const data = res.result
         // 获取详情页面的swiper
         this.topImg = data.itemInfo.topImages
@@ -103,18 +107,45 @@ export default {
     },
     getdetailRecommend() {
       DetailRecommendR().then((res) => {
-        console.log(res);
         // 获取详情页面推荐数据
         this.detailRecodData = res.data.list
       }).catch((err) => {
         console.log("详情页面获取推荐数据失败：" + err)
       })
+    },
+
+    /**
+     * 业务处理方法
+     * 
+     */
+    ScrollContent (e) {
+      this.idShowabacktop = -e.y > 500
+    },
+    BackTop () {
+      this.$refs.scrollDetail.scrollTo(0, 0)
+    },
+    // 图片加载完毕 刷新当前可滚动区域
+    ImgesLoad () {
+      this.$refs.scrollDetail.refresh()
     }
   }
 }
 </script>
-<style scoped>
+<style lang="scss" scoped>
 .goods-detail {
   padding-bottom: 60px;
+  position: relative;
+  z-index: 9;
+  background-color: #fff;
+  height: 100vh;
+  .detail-nav {
+    background: #fff;
+    position: relative;
+    z-index: 10;
+  }
+  .content {
+    width: 100%;
+    height: calc(100% - 44px);
+  }
 }
 </style>

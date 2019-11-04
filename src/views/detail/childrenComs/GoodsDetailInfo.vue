@@ -12,7 +12,7 @@
           <h3>{{item.key}}</h3>
         </div>
         <div v-for="(el, idx) in item.list" :key="idx" class="img">
-          <img :src="el" alt="">
+          <img :src="el" alt="" @load="imgLoad">
         </div>
       </div>
     </div>
@@ -24,6 +24,28 @@ export default {
   props: {
     goodsDetailInfo: {
       type: Object
+    }
+  },
+  data () {
+    return {
+      count: 0,
+      imgLength: 0
+    }
+  },
+  methods: {
+    imgLoad () {
+      // 处于性能考虑 判断图片最后一张加载完毕在发送事件
+      if (++this.count === this.imgLength) {
+        this.$emit('ImgesLoad')
+      }
+    }
+  },
+  watch: {
+    goodsDetailInfo: {
+      handler (newv) {
+        this.imgLength = newv.detailImage[0].list.length
+      },
+      deep: true
     }
   }
 }

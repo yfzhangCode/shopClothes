@@ -103,13 +103,13 @@ export default {
     })
 
   },
-  // 当前活跃的路由
+  // 当前活跃
   activated() {
     this.$refs.scrollBox.scrollTo(0, this.saveY, 0)
     // 重新计算滚动高度
     this.$refs.scrollBox.refresh()
   },
-  // 
+  // 离开时
   deactivated() {
     this.saveY = this.$refs.scrollBox.getScrollY()
   },

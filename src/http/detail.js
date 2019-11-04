@@ -59,8 +59,8 @@ export class Shop {
  * @export
  * @class DetailBottomInfo
  */
-export class DetailBottomInfo {
-  constructor(data) {
-    this.goodsParamsInfo = data.itemParams
-  }
-}
+// export class DetailBottomInfo {
+//   constructor(data) {
+//     this.goodsParamsInfo = data.itemParams
+//   }
+// }
