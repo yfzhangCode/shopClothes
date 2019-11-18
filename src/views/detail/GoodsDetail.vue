@@ -1,30 +1,49 @@
 <template>
   <div class="goods-detail">
     <!-- 详情导航 -->
-    <top-nav class="detail-nav"></top-nav>
+    <top-nav class="detail-nav" @navClick="tabClick" ref="navTab"></top-nav>
     <b-scroll class="content"
-      ref="scrollDetail"
+      ref="scrollBox"
       :probeType="3"
       @scrollOn="ScrollContent"
       >
       <!-- 详情页swiper -->
       <swiper-detail :TopImges="topImg"></swiper-detail>
       <!-- 详情基本信息 -->
-      <goods-base-info :goodsInfo="goodBaseInfo" :shopInfo="shopInfo"></goods-base-info>
+      <goods-base-info
+        :goodsInfo="goodBaseInfo"
+        :shopInfo="shopInfo"
+      ></goods-base-info>
       <!-- 店铺详情 -->
-      <shop-info :shopInfo="shopInfo"></shop-info>
+      <shop-info
+        :shopInfo="shopInfo"
+      ></shop-info>
       <!-- 商品详细信息 -->
-      <goods-detail-info :goodsDetailInfo="detailInfo" @ImgesLoad="ImgesLoad"></goods-detail-info>
+      <goods-detail-info
+        :goodsDetailInfo="detailInfo"
+        @ImgesLoad="ImgesLoad"
+        ></goods-detail-info>
       <!-- 商品参数信息 -->
-      <goods-params-info :paramsInfo="goodsParmInfo.info" :pramsRule="goodsParmInfo.rule"></goods-params-info>
+      <goods-params-info
+        :paramsInfo="goodsParmInfo.info"
+        :pramsRule="goodsParmInfo.rule"
+        ref="goodsParamInfo"
+      ></goods-params-info>
       <!-- 用户评价 -->
-      <user-rate :userRateInfo="userRate"></user-rate>
+      <user-rate
+        :userRateInfo="userRate"
+        ref="userInfo"
+      ></user-rate>
       <!-- 热门推荐 -->
-      <detail-recommend :detailRecodData="detailRecodData"></detail-recommend>
+      <detail-recommend
+        :detailRecodData="detailRecodData"
+        ref="DetailReconmmend"
+      ></detail-recommend>
     </b-scroll>
-
+    <!-- 底部工具栏 -->
+    <detail-bottom-bar @addCart="addToCart" @buy="buy"></detail-bottom-bar>
     <!-- backTop -->
-    <back-top v-show="idShowabacktop" @click.native="BackTop"></back-top>
+    <back-top @click.native="backTop" v-show="isShowBackTop" ></back-top>
   </div>
 </template>
 <script>
@@ -36,13 +55,16 @@ import GoodsDetailInfo from './childrenComs/GoodsDetailInfo'
 import GoodsParamsInfo from './childrenComs/GoodsParamsInfo'
 import UserRate from './childrenComs/UserRate'
 import DetailRecommend from './childrenComs/DetailRecommend'
-import BackTop from 'component/common/backTop/BackTop'
+import DetailBottomBar from './childrenComs/DetailBottombar'
 
 import BScroll from 'component/common/betterScroll/BetterScroll'
 
 import { Detail, DetailRecommendR, GoodBaseInfo, Shop } from 'http/detail'
+import { debounce } from 'utils/common'
+import { backTopMixin } from 'utils/mixins'
 export default {
   name: 'GoodsDetail',
+  mixins: [backTopMixin],
   data() {
     return {
       goodid: '',
@@ -57,16 +79,10 @@ export default {
       },
       userRate: {},
       detailRecodData: [],
-      idShowabacktop: false
+      scrollToDis: [], // 滚动的距离
+      getScrollInfoYs: null,
+      currentTabIndex: 0
     }
-  },
-  created() {
-    this.goodid = this.$route.params.iid
-  },
-  mounted () {
-    // 获取详情页数据
-    this.getDetailData(this.goodid)
-    this.getdetailRecommend()
   },
   components: {
     TopNav,
@@ -78,7 +94,23 @@ export default {
     UserRate,
     DetailRecommend,
     BScroll,
-    BackTop
+    DetailBottomBar
+  },
+  created () {
+    this.goodid = this.$route.params.iid
+  },
+  mounted () {
+    // 获取详情页数据
+    this.getDetailData(this.goodid)
+    this.getdetailRecommend()
+    this.getScrollInfoYs = debounce(() => {
+      // 获取每块的距离顶部的距离
+      this.scrollToDis.push(0)
+      this.scrollToDis.push(this.$refs.goodsParamInfo.$el.offsetTop);
+      this.scrollToDis.push(this.$refs.userInfo.$el.offsetTop);
+      this.scrollToDis.push(this.$refs.DetailReconmmend.$el.offsetTop);
+      this.scrollToDis.push(Number.MAX_VALUE);
+    }, 100)
   },
   methods: {
     /**
@@ -101,6 +133,7 @@ export default {
         this.goodsParmInfo.rule = data.itemParams.rule
         // 用户评价信息
         this.userRate = data.rate
+
       }).catch((err) => {
         console.log(err)
       })
@@ -119,14 +152,36 @@ export default {
      * 
      */
     ScrollContent (e) {
-      this.idShowabacktop = -e.y > 500
-    },
-    BackTop () {
-      this.$refs.scrollDetail.scrollTo(0, 0)
+      this.isShowBackTop = -e.y > 500
+      // 滚动与tab的联动
+      const position = -e.y;
+      for (let i = 0; i < this.scrollToDis.length -1; i++) {
+        if (this.currentTabIndex !== i &&
+          (position >= this.scrollToDis[i] && position < this.scrollToDis[i + 1])) {
+          this.currentTabIndex = i
+          this.$refs.navTab.currentIndex = i
+        }
+      }
     },
     // 图片加载完毕 刷新当前可滚动区域
     ImgesLoad () {
-      this.$refs.scrollDetail.refresh()
+      this.$refs.scrollBox.refresh()
+      // 防抖函数的获取激励顶部的高度
+      this.getScrollInfoYs()
+    },
+    // 顶部tab栏切换
+    tabClick (index) {
+      this.$refs.scrollBox.scrollTo(0, -this.scrollToDis[index], 500)
+    },
+    /**
+     * 底部工具栏
+     * 
+     */
+    addToCart () {
+      console.log('llll')
+    },
+    buy () {
+      console.log('buy')
     }
   }
 }

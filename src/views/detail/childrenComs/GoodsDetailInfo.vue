@@ -61,6 +61,7 @@ export default {
     margin: 0 auto;
     padding: 10px 0;
     position: relative;
+    line-height: 25px;
     p {
       padding: 5px 0;
       margin: 10px 0;
