@@ -62,6 +62,7 @@ import BScroll from 'component/common/betterScroll/BetterScroll'
 import { Detail, DetailRecommendR, GoodBaseInfo, Shop } from 'http/detail'
 import { debounce } from 'utils/common'
 import { backTopMixin } from 'utils/mixins'
+import { mapMutations, mapGetters } from 'vuex'
 export default {
   name: 'GoodsDetail',
   mixins: [backTopMixin],
@@ -179,10 +180,27 @@ export default {
      */
     addToCart () {
       console.log('llll')
+      // 获取购物车数据
+      let cartData = {}
+      cartData.iid = this.goodid
+      cartData.image = this.topImg[0]
+      cartData.title = this.goodBaseInfo.title
+      cartData.price = this.goodBaseInfo.price
+      cartData.count = 1
+      this.addCartInfo(cartData)
     },
     buy () {
       console.log('buy')
-    }
+    },
+    // vuex 提交修改数据
+    ...mapMutations({
+      addCartInfo: 'addCartGoods'
+    }),
+  },
+  computed: {
+    ...mapGetters([
+      'cartGoodsInfo'
+    ])
   }
 }
 </script>

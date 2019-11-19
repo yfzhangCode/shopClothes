@@ -16,7 +16,9 @@ module.exports = {
   css: {
 		loaderOptions: {
 			sass: {
-				prependData: `@import 'src/assets/style/_varibale.scss';`
+				prependData: `
+					@import "assets/style/_varibale.scss";
+				`
 			}
     }
   }
