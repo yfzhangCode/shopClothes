@@ -3,17 +3,13 @@ import { ADD_CART_GOODS } from './mutatons-type'
 
 const mutations = {
   [ADD_CART_GOODS] (state, pyload) {
-    console.log(state.cartGoodsInfo)
     pyload.ischecked = false
-    if (state.cartGoodsInfo.length > 0) {
-      state.cartGoodsInfo.map((item) => {
-        if (item.iid === pyload.iid) {
-          item.count += 1
-        } else {
-          state.cartGoodsInfo.push(pyload)
-        }
-      })
+    // 记录是否添加 find 返回符合条件的第一个元素 undefined findIndex 返回的是元素下标 -1
+    const oneInfo = state.cartGoodsInfo.find(item => item.iid === pyload.iid)
+    if (oneInfo) {
+      oneInfo.count += 1
     } else {
+      pyload.count = 1
       state.cartGoodsInfo.push(pyload)
     }
   }

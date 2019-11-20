@@ -12,12 +12,13 @@
     </div>
     <!-- 计算价钱 -->
     <div class="make-money">
-      <div class="check-all">
-        <span class="checkbox"></span>
+      <div class="check-all" @click.stop="slectAll">
+        <span class="checkbox" :class="isCheckedAll?'checked':''"></span>
         <span>全选</span>
       </div>
       <div class="total-num">
-        <span>总价：</span>
+        <span>总价：￥{{totalPrice}}</span>
+        <span class="take-pay">去结算</span>
       </div>
     </div>
   </div>
@@ -30,17 +31,34 @@ export default {
   name: 'Message',
   data () {
     return {
-      cartGoodsList: [] // 购物车数据
+      cartGoodsList: [], // 购物车数据
     }
   },
-  mounted() {
-    this.cartGoodsList = this.cartGoodsInfo
+  activated() {
+    this.cartGoodsList = this.$store.state.cartGoodsInfo.slice()
   },
   components: {
     navBar,
     cartList
   },
   computed: {
+    // 计算全选按钮
+    isCheckedAll () {
+      if (this.cartGoodsList.length === 0) return false
+      return this.cartGoodsList.filter((item) => {
+        if (item.ischecked) {
+          return item
+        }
+      }).length === this.cartGoodsList.length
+    },
+    // 计算总价钱
+    totalPrice () {
+      return this.cartGoodsList.filter(item => {
+        return item.ischecked
+      }).reduce((per, cur) => {
+        return per + cur.count * parseInt(cur.price.substring(1))
+      }, 0).toFixed(2)
+    },
     ...mapGetters([
       'cartGoodsInfo'
     ])
@@ -48,12 +66,23 @@ export default {
   methods: {
     // 选择商品
     itemClick (val) {
-      console.log(val)
-      this.cartGoodsList.map((item) => {
-        if (item.iid === val.iid) {
-          item.ischecked = !item.ischecked
-        }
-      })
+      this.cartGoodsList = val
+    },
+    // 全选效果
+    slectAll () {
+      console.log(this.cartGoodsList)
+      // 检测是否有未选中产品
+      const notSelect = this.cartGoodsList.find(item => { return !item.ischecked })
+      // 判断标志
+      if (notSelect) {
+        this.$store.state.cartGoodsInfo.map(item => {
+          item.ischecked = true
+        })
+      } else {
+        this.$store.state.cartGoodsInfo.map(item => {
+          item.ischecked = false
+        })
+      }
     }
   }
 }
@@ -100,6 +129,15 @@ export default {
     }
     .checked {
       background-color: #f3684f;
+    }
+  }
+  .total-num {
+    .take-pay {
+      display: inline-block;
+      padding: 10px;
+      color: #fff;
+      margin-left: 10px;
+      background-color: $theme_color;
     }
   }
 }

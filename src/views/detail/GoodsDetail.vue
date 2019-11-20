@@ -179,15 +179,16 @@ export default {
      * 
      */
     addToCart () {
-      console.log('llll')
       // 获取购物车数据
       let cartData = {}
       cartData.iid = this.goodid
       cartData.image = this.topImg[0]
       cartData.title = this.goodBaseInfo.title
       cartData.price = this.goodBaseInfo.price
-      cartData.count = 1
-      this.addCartInfo(cartData)
+      // let that = this
+      this.$store.dispatch('cartGoodsInfo', cartData).then((res) => {
+        this.$toast.show(res, 2000)
+      })
     },
     buy () {
       console.log('buy')

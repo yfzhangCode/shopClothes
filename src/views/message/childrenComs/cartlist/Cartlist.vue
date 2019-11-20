@@ -52,8 +52,13 @@ export default {
     this.$refs.cartScroll.refresh()
   },
   methods: {
-    itemClick (e, item) {
-      this.$emit('itemClick', item)
+    itemClick (e, $item) {
+      this.cartList.find((item) => {
+        if (item.iid === $item.iid) {
+          item.ischecked = !item.ischecked
+        }
+      })
+      this.$emit('itemClick', this.cartList)
     }
   }
 }
