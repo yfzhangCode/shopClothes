@@ -82,15 +82,15 @@ export default {
       }
     }
     .service {
-      background: url(/img/detail_bottom.a8e4b3c7.png) center -65px no-repeat;
+      background: url('/src/assets/img/detail_bottom.a8e4b3c7.png') center -65px no-repeat;
       background-size: 75%;
     }
     .shop {
-      background: url(/img/detail_bottom.a8e4b3c7.png) center -127px no-repeat;
+      background: url('/src/assets/img/detail_bottom.a8e4b3c7.png') center -127px no-repeat;
       background-size: 75%;
     }
     .cfav {
-      background: url(/img/detail_bottom.a8e4b3c7.png) center 9px no-repeat;
+      background: url('/src/assets/img/detail_bottom.a8e4b3c7.png') center 9px no-repeat;
       background-size: 75%;
     }
     .tools-right {
