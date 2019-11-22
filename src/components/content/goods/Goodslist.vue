@@ -1,6 +1,6 @@
 <template>
-  <div class="goods-list" @click.stop="itemGoodsClick">
-    <img v-lazy="goodslist.show.img" alt="" @load="imgLoad">
+  <div class="goods-list" @click.stop="itemGoodsClick" v-if="Object.keys(goodslist).length > 0">
+    <img v-lazy="showImg?goodslist.show.img:goodslist.img" alt="" @load="imgLoad">
     <div class="text">
       <h3>{{goodslist.title}}</h3>
       <span class="price">{{goodslist.price}}</span>
@@ -28,6 +28,11 @@ export default {
     itemGoodsClick () {
       console.log(this.goodslist.iid)
       this.$router.push('/detail/' + this.goodslist.iid)
+    }
+  },
+  computed: {
+    showImg() {
+      return this.goodslist.show !== undefined
     }
   }
 }

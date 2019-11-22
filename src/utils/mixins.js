@@ -12,7 +12,7 @@ export const backTopMixin = {
   methods: {
     // 返回顶部
     backTop() {
-      console.log(this.$refs.scrollBox)
+      // console.log(this.$refs.scrollBox)
       this.$refs.scrollBox.scrollTo(0,0,500)
     }
   }
