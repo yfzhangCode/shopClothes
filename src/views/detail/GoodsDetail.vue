@@ -1,31 +1,49 @@
 <template>
   <div class="goods-detail">
     <!-- 详情导航 -->
-    <top-nav></top-nav>
-    <!-- 详情页swiper -->
-    <div class="swiper">
+    <top-nav class="detail-nav" @navClick="tabClick" ref="navTab"></top-nav>
+    <b-scroll class="content"
+      ref="scrollBox"
+      :probeType="3"
+      @scrollOn="ScrollContent"
+      >
+      <!-- 详情页swiper -->
       <swiper-detail :TopImges="topImg"></swiper-detail>
-    </div>
-    <!-- 详情基本信息 -->
-    <div class="baseinfo">
-      <goods-base-info :goodsInfo="goodBaseInfo" :shopInfo="shopInfo"></goods-base-info>
-    </div>
-    <!-- 店铺详情 -->
-    <div class="shop-info">
-      <shop-info :shopInfo="shopInfo"></shop-info>
-    </div>
-    <!-- 商品详细信息 -->
-    <div>
-      <goods-detail-info :goodsDetailInfo="detailInfo"></goods-detail-info>
-    </div>
-    <!-- 商品参数信息 -->
-    <div>
-      <goods-params-info :paramsInfo="goodsParmInfo.info" :pramsRule="goodsParmInfo.rule"></goods-params-info>
-    </div>
-    <!-- 用户评价 -->
-    <user-rate :userRateInfo="userRate"></user-rate>
-    <!-- 热门推荐 -->
-    <detail-recommend :detailRecodData="detailRecodData"></detail-recommend>
+      <!-- 详情基本信息 -->
+      <goods-base-info
+        :goodsInfo="goodBaseInfo"
+        :shopInfo="shopInfo"
+      ></goods-base-info>
+      <!-- 店铺详情 -->
+      <shop-info
+        :shopInfo="shopInfo"
+      ></shop-info>
+      <!-- 商品详细信息 -->
+      <goods-detail-info
+        :goodsDetailInfo="detailInfo"
+        @ImgesLoad="ImgesLoad"
+        ></goods-detail-info>
+      <!-- 商品参数信息 -->
+      <goods-params-info
+        :paramsInfo="goodsParmInfo.info"
+        :pramsRule="goodsParmInfo.rule"
+        ref="goodsParamInfo"
+      ></goods-params-info>
+      <!-- 用户评价 -->
+      <user-rate
+        :userRateInfo="userRate"
+        ref="userInfo"
+      ></user-rate>
+      <!-- 热门推荐 -->
+      <detail-recommend
+        :detailRecodData="detailRecodData"
+        ref="DetailReconmmend"
+      ></detail-recommend>
+    </b-scroll>
+    <!-- 底部工具栏 -->
+    <detail-bottom-bar @addCart="addToCart" @buy="buy"></detail-bottom-bar>
+    <!-- backTop -->
+    <back-top @click.native="backTop" v-show="isShowBackTop" ></back-top>
   </div>
 </template>
 <script>
@@ -37,10 +55,17 @@ import GoodsDetailInfo from './childrenComs/GoodsDetailInfo'
 import GoodsParamsInfo from './childrenComs/GoodsParamsInfo'
 import UserRate from './childrenComs/UserRate'
 import DetailRecommend from './childrenComs/DetailRecommend'
+import DetailBottomBar from './childrenComs/DetailBottombar'
+
+import BScroll from 'component/common/betterScroll/BetterScroll'
 
 import { Detail, DetailRecommendR, GoodBaseInfo, Shop } from 'http/detail'
+import { debounce } from 'utils/common'
+import { backTopMixin } from 'utils/mixins'
+import { mapMutations, mapGetters } from 'vuex'
 export default {
   name: 'GoodsDetail',
+  mixins: [backTopMixin],
   data() {
     return {
       goodid: '',
@@ -54,16 +79,11 @@ export default {
         info: {}
       },
       userRate: {},
-      detailRecodData: []
+      detailRecodData: [],
+      scrollToDis: [], // 滚动的距离
+      getScrollInfoYs: null,
+      currentTabIndex: 0
     }
-  },
-  created() {
-    this.goodid = this.$route.params.iid
-  },
-  mounted () {
-    // 获取详情页数据
-    this.getDetailData(this.goodid)
-    this.getdetailRecommend()
   },
   components: {
     TopNav,
@@ -73,7 +93,25 @@ export default {
     GoodsDetailInfo,
     GoodsParamsInfo,
     UserRate,
-    DetailRecommend
+    DetailRecommend,
+    BScroll,
+    DetailBottomBar
+  },
+  created () {
+    this.goodid = this.$route.params.iid
+  },
+  mounted () {
+    // 获取详情页数据
+    this.getDetailData(this.goodid)
+    this.getdetailRecommend()
+    this.getScrollInfoYs = debounce(() => {
+      // 获取每块的距离顶部的距离
+      this.scrollToDis.push(0)
+      this.scrollToDis.push(this.$refs.goodsParamInfo.$el.offsetTop);
+      this.scrollToDis.push(this.$refs.userInfo.$el.offsetTop);
+      this.scrollToDis.push(this.$refs.DetailReconmmend.$el.offsetTop);
+      this.scrollToDis.push(Number.MAX_VALUE);
+    }, 100)
   },
   methods: {
     /**
@@ -82,7 +120,6 @@ export default {
      */
     getDetailData (id) {
       Detail(id).then((res) => {
-        console.log(res);
         const data = res.result
         // 获取详情页面的swiper
         this.topImg = data.itemInfo.topImages
@@ -97,24 +134,92 @@ export default {
         this.goodsParmInfo.rule = data.itemParams.rule
         // 用户评价信息
         this.userRate = data.rate
+
       }).catch((err) => {
         console.log(err)
       })
     },
     getdetailRecommend() {
       DetailRecommendR().then((res) => {
-        console.log(res);
         // 获取详情页面推荐数据
         this.detailRecodData = res.data.list
       }).catch((err) => {
         console.log("详情页面获取推荐数据失败：" + err)
       })
-    }
+    },
+
+    /**
+     * 业务处理方法
+     * 
+     */
+    ScrollContent (e) {
+      this.isShowBackTop = -e.y > 500
+      // 滚动与tab的联动
+      const position = -e.y;
+      for (let i = 0; i < this.scrollToDis.length -1; i++) {
+        if (this.currentTabIndex !== i &&
+          (position >= this.scrollToDis[i] && position < this.scrollToDis[i + 1])) {
+          this.currentTabIndex = i
+          this.$refs.navTab.currentIndex = i
+        }
+      }
+    },
+    // 图片加载完毕 刷新当前可滚动区域
+    ImgesLoad () {
+      this.$refs.scrollBox.refresh()
+      // 防抖函数的获取激励顶部的高度
+      this.getScrollInfoYs()
+    },
+    // 顶部tab栏切换
+    tabClick (index) {
+      this.$refs.scrollBox.scrollTo(0, -this.scrollToDis[index], 500)
+    },
+    /**
+     * 底部工具栏
+     * 
+     */
+    addToCart () {
+      // 获取购物车数据
+      let cartData = {}
+      cartData.iid = this.goodid
+      cartData.image = this.topImg[0]
+      cartData.title = this.goodBaseInfo.title
+      cartData.price = this.goodBaseInfo.price
+      // let that = this
+      this.$store.dispatch('cartGoodsInfo', cartData).then((res) => {
+        this.$toast.show(res, 2000)
+      })
+    },
+    buy () {
+      console.log('buy')
+    },
+    // vuex 提交修改数据
+    ...mapMutations({
+      addCartInfo: 'addCartGoods'
+    }),
+  },
+  computed: {
+    ...mapGetters([
+      'cartGoodsInfo'
+    ])
   }
 }
 </script>
-<style scoped>
+<style lang="scss" scoped>
 .goods-detail {
   padding-bottom: 60px;
+  position: relative;
+  z-index: 9;
+  background-color: #fff;
+  height: 100vh;
+  .detail-nav {
+    background: #fff;
+    position: relative;
+    z-index: 10;
+  }
+  .content {
+    width: 100%;
+    height: calc(100% - 44px);
+  }
 }
 </style>

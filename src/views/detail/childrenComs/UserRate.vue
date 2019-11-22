@@ -7,7 +7,7 @@
         <span class="arrow-right"></span>
       </div>
     </div>
-    <div class="user-rate-items">
+    <div class="user-rate-items" v-if="Object.keys(userRateInfo).length > 0">
       <ul>
         <li class="item" v-for="(item, index) in userRateInfo.list" :key="index">
           <div class="user-info">
@@ -21,7 +21,7 @@
             {{item.content}}
           </div>
           <div class="desc-time-and-size">
-            <span>{{item.created}}</span>
+            <span>{{item.created | showDate}}</span>
             <span>{{item.style}}</span>
           </div>
         </li>
@@ -30,6 +30,7 @@
   </div>
 </template>
 <script>
+import {FormatDateTime} from 'utils/common'
 export default {
   name: 'UserRate',
   props: {
@@ -38,6 +39,14 @@ export default {
       default() {
         return {}
       }
+    }
+  },
+  filters: {
+    showDate(value) {
+      // 时间戳转换成 Date 对象
+      const DateStr = new Date(value * 1000)
+      // 使用时间戳转化 format
+      return FormatDateTime(DateStr, 'yyyy-mm-dd')
     }
   }
 }

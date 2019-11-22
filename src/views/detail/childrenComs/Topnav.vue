@@ -38,6 +38,7 @@ export default {
     // 导航切换
     navItemClick (idx) {
       this.currentIndex = idx
+      this.$emit('navClick', idx)
     },
     // 返回上一级
     backNext () {
@@ -53,6 +54,8 @@ export default {
   }
   .back {
     img {
+      width: 30px;
+      height: 30px;
       vertical-align: middle;
     }
   }

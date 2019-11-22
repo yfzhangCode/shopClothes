@@ -50,13 +50,14 @@ import HotRecommend from './childrenCons/HotRecommend'
 import TabControl from 'component/content/tabControl/TabControl'
 import Goods from 'component/content/goods/Goods'
 import Scroll from 'component/common/betterScroll/BetterScroll'
-import BackTop from 'component/common/backTop/BackTop'
 
 import { getData, homeData } from '../../http/home.js'
 import { ERR_OK } from 'utils/const'
 import { debounce } from 'utils/common'
+import { backTopMixin } from 'utils/mixins'
 export default {
   name: 'Home',
+  mixins: [backTopMixin],
   data() {
     return {
       banners: [], // 轮播图数据
@@ -68,7 +69,6 @@ export default {
         'new': {page: 0, list: []},
         'sell': {page: 0, list: []}
       },
-      isShowBackTop: false, // 控制返回顶部按钮的显示隐藏
       swiperImgisLoad: true, // 调用一次函数
       isTabControlOffsetHeight: 0, // 获取tabControl的距离顶部距离
       isFixed: false // 控制tabControl的展示
@@ -81,13 +81,11 @@ export default {
     HotRecommend,
     TabControl,
     Goods,
-    Scroll,
-    BackTop
+    Scroll
   },
   created () {
     // 获取首页数据
     this.getMultadata()
-
     // 获取首页商品数据
     this.getHomeGoodsData('pop')
     this.getHomeGoodsData('new')
@@ -103,13 +101,13 @@ export default {
     })
 
   },
-  // 当前活跃的路由
+  // 当前活跃
   activated() {
     this.$refs.scrollBox.scrollTo(0, this.saveY, 0)
     // 重新计算滚动高度
     this.$refs.scrollBox.refresh()
   },
-  // 
+  // 离开时
   deactivated() {
     this.saveY = this.$refs.scrollBox.getScrollY()
   },
@@ -174,11 +172,6 @@ export default {
       // 统一 tabControl 的当前选中项
       this.$refs.tabControlTop.currentIndex = val
       this.$refs.tabControl.currentIndex = val
-    },
-    // 返回顶部
-    backTop() {
-      // console.log(this.$refs.scrollBox)
-      this.$refs.scrollBox.scrollTo(0,0,500)
     },
     // 返回顶部按钮的显示或隐藏
     scrollContent(e) {

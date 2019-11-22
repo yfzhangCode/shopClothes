@@ -27,7 +27,7 @@
           <img slot="icon-img" src="~assets/img/tarbar/tab_icon_message_def@3x.png" alt="">
           <img slot="active-icon-img" src="~assets/img/tarbar/tab_icon_message_selected@3x.png" alt="">
           <div slot="icon-text" class="icon_text">
-            <span>消息</span>
+            <span>购物车</span>
           </div>
         </tabar-item>
       </router-link>
